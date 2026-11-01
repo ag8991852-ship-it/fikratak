@@ -1,1 +1,362 @@
-index.html
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#101c35">
+  <title>فِكرتك | فكرتك تستاهل تبقى حقيقة</title>
+  <style>
+    :root {
+      --navy: #101c35;
+      --blue: #203b68;
+      --gold: #f2bd58;
+      --light: #f5f7fb;
+      --text: #18243a;
+      --muted: #68758b;
+      --white: #fff;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Tahoma, Arial, sans-serif;
+      background: var(--light);
+      color: var(--text);
+      line-height: 1.7;
+    }
+    header {
+      background: var(--navy);
+      color: white;
+      padding: 18px 6%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .logo { font-size: 27px; font-weight: bold; color: var(--gold); }
+    header a { color: white; text-decoration: none; }
+    .hero {
+      background: linear-gradient(135deg, #101c35, #294a79);
+      color: white;
+      padding: 65px 7%;
+      text-align: center;
+    }
+    .hero h1 { font-size: clamp(30px, 5vw, 48px); margin: 0 0 12px; }
+    .hero p { color: #e2e9f5; font-size: 18px; }
+    .hero button, button {
+      border: 0;
+      border-radius: 10px;
+      padding: 12px 20px;
+      background: var(--gold);
+      color: var(--navy);
+      font-weight: bold;
+      font-size: 15px;
+      cursor: pointer;
+    }
+    main { max-width: 1100px; margin: auto; padding: 30px 18px 60px; }
+    .section-title { margin: 28px 0 15px; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+    }
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 5px 22px #17294a0d;
+      border: 1px solid #e9edf4;
+    }
+    .card h3 { margin-top: 0; }
+    .number { color: var(--blue); font-size: 28px; font-weight: bold; }
+    input, textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #d8deea;
+      border-radius: 9px;
+      font: inherit;
+      margin: 7px 0 13px;
+      background: white;
+    }
+    textarea { min-height: 85px; resize: vertical; }
+    label { font-weight: bold; font-size: 14px; }
+    .project {
+      border: 1px solid #e8edf4;
+      padding: 14px;
+      border-radius: 12px;
+      margin: 12px 0;
+    }
+    .project small { color: var(--muted); }
+    .progress {
+      height: 9px;
+      background: #e8edf4;
+      border-radius: 20px;
+      overflow: hidden;
+      margin: 10px 0;
+    }
+    .progress span {
+      display: block;
+      height: 100%;
+      background: #2e9b75;
+    }
+    .task { display: flex; align-items: center; gap: 9px; margin: 9px 0; }
+    .task input { width: auto; margin: 0; }
+    .muted { color: var(--muted); }
+    .result {
+      background: #eef5ff;
+      border-radius: 10px;
+      padding: 14px;
+      margin-top: 12px;
+    }
+    .challenge-item { padding: 10px 0; border-bottom: 1px solid #edf0f5; }
+    footer {
+      text-align: center;
+      background: var(--navy);
+      color: #dce5f3;
+      padding: 25px;
+    }
+    .danger { background: #fce8e8; color: #9b2929; }
+    @media (max-width: 600px) {
+      header { padding: 14px 5%; }
+      .hero { padding: 48px 5%; }
+      main { padding: 20px 14px 40px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">فِكرتك ✦</div>
+    <a href="#projects">مشاريعي</a>
+    <a href="#calculator">حاسبة الأرباح</a>
+  </header>
+
+  <section class="hero">
+    <h1>فكرتك تستاهل تبقى حقيقة</h1>
+    <p>من مجرد فكرة... لخطة واضحة ومشروع على أرض الواقع.</p>
+    <button onclick="document.getElementById('newProject').scrollIntoView({behavior:'smooth'})">
+      ابدأ مشروعك دلوقتي
+    </button>
+  </section>
+
+  <main>
+    <h2 class="section-title">لوحة التحكم</h2>
+    <div class="grid">
+      <div class="card">
+        <div class="muted">مشاريعي</div>
+        <div class="number" id="projectCount">0</div>
+      </div>
+      <div class="card">
+        <div class="muted">المهام المكتملة</div>
+        <div class="number" id="taskCount">0</div>
+      </div>
+      <div class="card">
+        <div class="muted">نسبة الإنجاز الكلية</div>
+        <div class="number" id="overallProgress">0%</div>
+      </div>
+    </div>
+
+    <section id="newProject">
+      <h2 class="section-title">أضف فكرتك الجديدة 💡</h2>
+      <div class="card">
+        <label for="projectName">اسم المشروع</label>
+        <input id="projectName" placeholder="مثلاً: متجر منتجات يدوية">
+        <label for="projectIdea">وصف الفكرة</label>
+        <textarea id="projectIdea" placeholder="احكي لنا فكرتك باختصار..."></textarea>
+        <button onclick="addProject()">إضافة المشروع</button>
+      </div>
+    </section>
+
+    <section id="projects">
+      <h2 class="section-title">مشاريعي وخطة التنفيذ 🚀</h2>
+      <div id="projectList" class="grid"></div>
+      <p id="emptyMessage" class="muted">لسه مفيش مشاريع. ابدأ بإضافة فكرتك الأولى!</p>
+    </section>
+
+    <section id="calculator">
+      <h2 class="section-title">حاسبة الأرباح ونقطة التعادل 💰</h2>
+      <div class="card">
+        <label for="price">سعر بيع المنتج الواحد (جنيه)</label>
+        <input id="price" type="number" min="0" placeholder="مثلاً 250">
+        <label for="cost">تكلفة المنتج الواحد (جنيه)</label>
+        <input id="cost" type="number" min="0" placeholder="مثلاً 120">
+        <label for="fixed">المصاريف الشهرية الثابتة (جنيه)</label>
+        <input id="fixed" type="number" min="0" placeholder="مثلاً 3000">
+        <button onclick="calculate()">احسب النتائج</button>
+        <div id="calcResult" class="result" hidden></div>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="section-title">تحدي أول 7 أيام 🎯</h2>
+      <div class="card" id="challenge">
+        <p class="muted">خطوات صغيرة تساعدك تبدأ بدل ما تفضل مستني الوقت المثالي.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="logo">فِكرتك ✦</div>
+    فكرتك تستاهل تبقى حقيقة
+  </footer>
+
+  <script>
+    const storageKey = "fikratak_projects_v1";
+    let projects = [];
+    try {
+      projects = JSON.parse(localStorage.getItem(storageKey) || "[]");
+      if (!Array.isArray(projects)) projects = [];
+    } catch (e) { projects = []; }
+
+    function save() {
+      localStorage.setItem(storageKey, JSON.stringify(projects));
+      render();
+    }
+
+    function addProject() {
+      const name = document.getElementById("projectName").value.trim();
+      const idea = document.getElementById("projectIdea").value.trim();
+      if (!name) {
+        alert("اكتب اسم المشروع الأول.");
+        return;
+      }
+      projects.push({
+        id: Date.now(),
+        name,
+        idea,
+        tasks: [
+          { title: "تحديد العميل المستهدف", done: false },
+          { title: "دراسة المنافسين والسوق", done: false },
+          { title: "تحديد التكلفة والسعر", done: false },
+          { title: "تجهيز أول عرض للعميل", done: false }
+        ]
+      });
+      document.getElementById("projectName").value = "";
+      document.getElementById("projectIdea").value = "";
+      save();
+    }
+
+    function toggleTask(projectId, taskIndex, checked) {
+      const project = projects.find(p => p.id === projectId);
+      if (!project) return;
+      project.tasks[taskIndex].done = checked;
+      save();
+    }
+
+    function deleteProject(id) {
+      if (!confirm("متأكد إنك عايز تحذف المشروع؟")) return;
+      projects = projects.filter(p => p.id !== id);
+      save();
+    }
+
+    function render() {
+      const list = document.getElementById("projectList");
+      list.innerHTML = "";
+      let totalTasks = 0, completed = 0;
+
+      projects.forEach(project => {
+        const done = project.tasks.filter(t => t.done).length;
+        totalTasks += project.tasks.length;
+        completed += done;
+        const percent = project.tasks.length
+          ? Math.round(done / project.tasks.length * 100) : 0;
+
+        const card = document.createElement("div");
+        card.className = "card";
+        const heading = document.createElement("h3");
+        heading.textContent = project.name;
+        const description = document.createElement("p");
+        description.className = "muted";
+        description.textContent = project.idea || "بدون وصف حتى الآن";
+        const progressText = document.createElement("strong");
+        progressText.textContent = "إنجاز المشروع: " + percent + "%";
+        const bar = document.createElement("div");
+        bar.className = "progress";
+        const fill = document.createElement("span");
+        fill.style.width = percent + "%";
+        bar.appendChild(fill);
+        card.append(heading, description, progressText, bar);
+
+        project.tasks.forEach((task, index) => {
+          const row = document.createElement("label");
+          row.className = "task";
+          const checkbox = document.createElement("input");
+          checkbox.type = "checkbox";
+          checkbox.checked = task.done;
+          checkbox.addEventListener("change", () =>
+            toggleTask(project.id, index, checkbox.checked));
+          const title = document.createElement("span");
+          title.textContent = task.title;
+          row.append(checkbox, title);
+          card.appendChild(row);
+        });
+
+        const remove = document.createElement("button");
+        remove.className = "danger";
+        remove.textContent = "حذف المشروع";
+        remove.style.marginTop = "12px";
+        remove.addEventListener("click", () => deleteProject(project.id));
+        card.appendChild(remove);
+        list.appendChild(card);
+      });
+
+      document.getElementById("emptyMessage").hidden = projects.length > 0;
+      document.getElementById("projectCount").textContent = projects.length;
+      document.getElementById("taskCount").textContent = completed;
+      document.getElementById("overallProgress").textContent =
+        totalTasks ? Math.round(completed / totalTasks * 100) + "%" : "0%";
+    }
+
+    function calculate() {
+      const price = Number(document.getElementById("price").value);
+      const cost = Number(document.getElementById("cost").value);
+      const fixed = Number(document.getElementById("fixed").value);
+      const result = document.getElementById("calcResult");
+      result.hidden = false;
+
+      if (price <= 0 || cost < 0 || fixed < 0 ||
+          !Number.isFinite(price + cost + fixed)) {
+        result.textContent = "راجع الأرقام واكتب سعر بيع أكبر من صفر.";
+        return;
+      }
+      if (price <= cost) {
+        result.textContent = "سعر البيع لازم يكون أكبر من تكلفة الوحدة عشان تحقق هامش ربح.";
+        return;
+      }
+      const margin = price - cost;
+      const breakEven = Math.ceil(fixed / margin);
+      result.innerHTML =
+        "<strong>ربح الوحدة:</strong> " + margin.toFixed(2) + " جنيه<br>" +
+        "<strong>عدد الوحدات للوصول لنقطة التعادل:</strong> " + breakEven +
+        " وحدة<br><strong>هامش المساهمة:</strong> " +
+        (margin / price * 100).toFixed(1) + "%";
+    }
+
+    const challengeTasks = [
+      "اليوم 1: اكتب فكرتك وحدد المشكلة اللي بتحلها.",
+      "اليوم 2: حدد مين العميل اللي محتاج منتجك.",
+      "اليوم 3: اسأل 3 أشخاص من العملاء المحتملين.",
+      "اليوم 4: شوف المنافسين وأسعارهم.",
+      "اليوم 5: احسب التكلفة وسعر البيع.",
+      "اليوم 6: جهز نموذج أو عرض بسيط لمنتجك.",
+      "اليوم 7: اعرض فكرتك على أول عميل محتمل."
+    ];
+    const challenge = document.getElementById("challenge");
+    challengeTasks.forEach((task, index) => {
+      const row = document.createElement("label");
+      row.className = "task challenge-item";
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.checked = localStorage.getItem("fikratak_day_" + index) === "1";
+      checkbox.addEventListener("change", () =>
+        localStorage.setItem("fikratak_day_" + index, checkbox.checked ? "1" : "0"));
+      const text = document.createElement("span");
+      text.textContent = task;
+      row.append(checkbox, text);
+      challenge.appendChild(row);
+    });
+
+    render();
+  </script>
+</body>
+</html>
