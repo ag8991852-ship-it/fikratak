@@ -61,6 +61,12 @@ input:focus,textarea:focus,select:focus{outline:3px solid #f5dfad;border-color:#
 .item{padding:13px;border:1px solid var(--line);border-radius:11px;margin:9px 0}
 .item button{margin:5px 4px}
 footer{text-align:center;color:var(--muted);font-size:12px;padding:25px}
+.report-section{margin:20px 0;padding:16px;border:1px solid var(--line);border-radius:13px}
+.report-section h2{margin-bottom:10px}
+.report-section li{margin:7px 0}
+.report-good{background:#f0f8f1}
+.report-warning{background:#fff8e8}
+.report-risk{background:#fff3f3}
 @media(max-width:760px){
  .layout{grid-template-columns:1fr}
  aside{position:static}
@@ -68,6 +74,18 @@ footer{text-align:center;color:var(--muted);font-size:12px;padding:25px}
  .grid{grid-template-columns:1fr}
  .head{align-items:flex-start;flex-direction:column}
  .panel{padding:16px}
+}
+@media print{
+ body{background:#fff;color:#000;font-size:12pt}
+ header,aside,footer,.actions,.notice,#reportEdit,#reportChat,#reportSave,#reportPrint{display:none!important}
+ .layout{display:block;margin:0;padding:0;max-width:none}
+ main{width:100%}
+ .panel{border:0;padding:0;margin:0}
+ .page{display:none!important}
+ #report{display:block!important}
+ #reportContent{display:block!important}
+ .answerbox,.report-section{break-inside:avoid;border:1px solid #ccc;background:#fff!important}
+ h1,h2,h3{color:#000}
 }
 </style>
 </head>
@@ -123,7 +141,7 @@ footer{text-align:center;color:var(--muted);font-size:12px;padding:25px}
  <div class="actions">
   <button class="light" id="prev">رجوع</button>
   <button class="primary" id="next">التالي</button>
-  <button class="gold hidden" id="finish">اعرض ملخص المشروع</button>
+  <button class="gold hidden" id="finish">اعرض تقرير المشروع</button>
  </div>
  <div class="notice">مش لازم تكون عارف كل الإجابات. اكتب «لسه مش عارف» لو محتاج مساعدة في نقطة معينة.</div>
 </section>
@@ -170,12 +188,14 @@ footer{text-align:center;color:var(--muted);font-size:12px;padding:25px}
 </section>
 
 <section id="report" class="page panel hidden">
- <h1>ملخص مشروعك</h1>
+ <h1>تقرير مشروعك</h1>
+ <p class="muted" id="reportDate"></p>
  <div id="reportContent"></div>
  <div class="actions">
   <button class="primary" id="reportEdit">عدّل المشروع</button>
   <button class="gold" id="reportChat">ناقش المشروع مع المساعد</button>
   <button class="light" id="reportSave">حفظ المشروع</button>
+  <button class="light" id="reportPrint">طباعة التقرير / حفظ PDF</button>
  </div>
 </section>
 </main>
@@ -186,6 +206,7 @@ footer{text-align:center;color:var(--muted);font-size:12px;padding:25px}
 (function(){
 "use strict";
 const $=id=>document.getElementById(id);
+
 const steps=[
  {key:"idea",title:"1. احكيلي عن فكرتك",hint:"إيه المنتج أو الخدمة اللي نفسك تقدمها؟",type:"textarea",placeholder:"اكتب فكرتك بالتفصيل حتى لو مش مرتبة..."},
  {key:"problem",title:"2. إيه المشكلة؟",hint:"إيه المشكلة اللي مشروعك هيحلها؟",type:"textarea",placeholder:"إيه اللي مضايق الناس وعايز تحسّنه؟"},
@@ -198,25 +219,41 @@ const steps=[
  {key:"marketing",title:"9. هتوصل للعميل إزاي؟",hint:"سوشيال ميديا، محل، توصيات، إعلانات...؟",type:"textarea",placeholder:"اكتب أفكارك للتسويق..."},
  {key:"resources",title:"10. إيه المتاح عندك؟",hint:"خبرة، مهارات، أدوات، وقت، شركاء أو مكان.",type:"textarea",placeholder:"اكتب كل الإمكانيات المتاحة..."}
 ];
+
 let project={id:null,name:"",answers:{},step:0};
 let projects=[];
-let returnToReport=false;
-function blank(){return {id:Date.now().toString(),name:"مشروع جديد",answers:{},step:0,updated:new Date().toISOString()};}
+
+function blank(){
+ return {id:Date.now().toString(),name:"مشروع جديد",answers:{},step:0,updated:new Date().toISOString()};
+}
+
 function load(){
- try{projects=JSON.parse(localStorage.getItem("fikratak_v2")||"[]");if(!Array.isArray(projects))projects=[]}
- catch(e){projects=[]}
+ try{
+  projects=JSON.parse(localStorage.getItem("fikratak_v2")||"[]");
+  if(!Array.isArray(projects))projects=[];
+ }catch(e){projects=[]}
 }
+
 function persist(){
- try{localStorage.setItem("fikratak_v2",JSON.stringify(projects));return true}
- catch(e){alert("تعذر الحفظ. مساحة التخزين في المتصفح قد تكون ممتلئة.");return false}
+ try{
+  localStorage.setItem("fikratak_v2",JSON.stringify(projects));
+  return true;
+ }catch(e){
+  alert("تعذر الحفظ. مساحة التخزين في المتصفح قد تكون ممتلئة.");
+  return false;
+ }
 }
+
 function upsert(){
  project.updated=new Date().toISOString();
  const i=projects.findIndex(p=>p.id===project.id);
  if(i<0)projects.unshift(JSON.parse(JSON.stringify(project)));
  else projects[i]=JSON.parse(JSON.stringify(project));
- persist();refreshHome();renderProjects();
+ persist();
+ refreshHome();
+ renderProjects();
 }
+
 function showPage(name){
  document.querySelectorAll(".page").forEach(p=>p.classList.add("hidden"));
  $(name).classList.remove("hidden");
@@ -225,13 +262,21 @@ function showPage(name){
  if(name==="home")refreshHome();
  window.scrollTo({top:0,behavior:"smooth"});
 }
+
 function startNew(){
- project=blank();renderWizard();showPage("wizard");
+ project=blank();
+ renderWizard();
+ showPage("wizard");
 }
+
 function openProject(id){
- const found=projects.find(p=>p.id===id);if(!found)return;
- project=JSON.parse(JSON.stringify(found));renderWizard();showPage("wizard");
+ const found=projects.find(p=>p.id===id);
+ if(!found)return;
+ project=JSON.parse(JSON.stringify(found));
+ renderWizard();
+ showPage("wizard");
 }
+
 function renderWizard(){
  const n=project.step;
  const s=steps[n];
@@ -247,16 +292,37 @@ function renderWizard(){
  $("prev").disabled=n===0;
  $("next").classList.toggle("hidden",n===steps.length-1);
  $("finish").classList.toggle("hidden",n!==steps.length-1);
- $("stepButtons").querySelectorAll("button").forEach(b=>b.onclick=()=>{capture();project.step=Number(b.dataset.step);renderWizard()});
+ $("stepButtons").querySelectorAll("button").forEach(b=>b.onclick=()=>{
+  capture();
+  project.step=Number(b.dataset.step);
+  renderWizard();
+ });
 }
-function capture(){const s=steps[project.step];const f=$("field");if(f)project.answers[s.key]=f.value.trim()}
+
+function capture(){
+ const s=steps[project.step];
+ const f=$("field");
+ if(f)project.answers[s.key]=f.value.trim();
+}
+
 function next(){
- capture();const s=steps[project.step];
- if(!project.answers[s.key]){alert("اكتب إجابة أو اختار «لسه مش محددة» عشان نكمل.");return}
+ capture();
+ const s=steps[project.step];
+ if(!project.answers[s.key]){
+  alert("اكتب إجابة أو اختار إجابة عشان نكمل.");
+  return;
+ }
  if(project.step<steps.length-1)project.step++;
- renderWizard();upsert();
+ renderWizard();
+ upsert();
 }
-function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+
+function esc(v){
+ return String(v??"").replace(/[&<>"']/g,c=>({
+  "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+ }[c]));
+}
+
 function renderProjects(){
  $("projectList").innerHTML=projects.length?projects.map(p=>`
  <div class="item">
@@ -267,65 +333,136 @@ function renderProjects(){
  <button class="primary" data-open="${esc(p.id)}">استكمل المشروع</button>
  <button class="danger" data-delete="${esc(p.id)}">حذف</button>
  </div></div>`).join(""):'<p class="muted">لسه مفيش مشروعات. ابدأ أول مشروع ليك.</p>';
+
  $("projectList").querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>openProject(b.dataset.open));
- $("projectList").querySelectorAll("[data-delete]").forEach(b=>b.onclick=()=>{if(confirm("متأكد إنك عايز تحذف المشروع؟")){projects=projects.filter(p=>p.id!==b.dataset.delete);persist();renderProjects();refreshHome()}});
+ $("projectList").querySelectorAll("[data-delete]").forEach(b=>b.onclick=()=>{
+  if(confirm("متأكد إنك عايز تحذف المشروع؟")){
+   projects=projects.filter(p=>p.id!==b.dataset.delete);
+   persist();
+   renderProjects();
+   refreshHome();
+  }
+ });
 }
+
 function refreshHome(){
  $("projectCount").textContent=projects.length;
  const p=projects[0];
- $("lastProject").innerHTML=p?`<b>${esc(p.name||p.answers.idea||"مشروع جديد")}</b><p class="muted">${esc(p.answers.idea||"لسه بتبني تفاصيل فكرتك")}</p><button class="primary" id="resumeLast">استكمل المشروع</button>`:"لسه مفيش مشروع محفوظ. ابدأ فكرتك الأولى.";
- const b=$("resumeLast");if(b)b.onclick=()=>openProject(p.id);
+ $("lastProject").innerHTML=p?
+ `<b>${esc(p.name||p.answers.idea||"مشروع جديد")}</b><p class="muted">${esc(p.answers.idea||"لسه بتبني تفاصيل فكرتك")}</p><button class="primary" id="resumeLast">استكمل المشروع</button>`:
+ "لسه مفيش مشروع محفوظ. ابدأ فكرتك الأولى.";
+ const b=$("resumeLast");
+ if(b)b.onclick=()=>openProject(p.id);
 }
+
+/* إنشاء التقرير المطور */
 function report(){
- capture();upsert();
+ capture();
+ upsert();
+
  const a=project.answers;
- $("reportContent").innerHTML=steps.map(s=>`<div class="answerbox"><b>${esc(s.title)}</b><br>${esc(a[s.key]||"لم تتم الإجابة بعد")}</div>`).join("")+
- `<h2>خطة البداية المقترحة</h2>
- <ol>
- <li>اتكلم مع 5 أشخاص من العملاء المتوقعين واسألهم عن المشكلة.</li>
- <li>ابحث عن البدائل الموجودة في منطقتك أو على الإنترنت.</li>
- <li>اعمل نموذجًا صغيرًا أو تجربة محدودة قبل الإنفاق الكبير.</li>
- <li>احسب التكلفة والسعر والوقت والمصاريف الإضافية.</li>
- <li>سجل ردود الناس وطور فكرتك بناءً على التجربة.</li>
- </ol>`;
- showPage("report");
-}
-function addMessage(text,type){
- const d=document.createElement("div");d.className="msg "+type;d.textContent=text;$("chat").appendChild(d);$("chat").scrollTop=$("chat").scrollHeight;
-}
-function assistantReply(q){
- const t=q.toLowerCase();
- const a=project.answers||{};
- const context=a.idea?`\n\nوبالنسبة لفكرتك المسجلة: ${a.idea}`:"";
- if(/سعر|تسعير|تكلف/.test(t))return "ابدأ بحساب تكلفة الوحدة كاملة: الخامات + التغليف + التوصيل + وقت العمل + نصيبها من المصاريف الثابتة. بعد كده قارن السعر ببدائل السوق واسأل العملاء عن السعر المقبول. ما تحددش السعر بالتخمين وحده."+context;
- if(/عميل|زبون|بيع/.test(t))return "اختار 5 إلى 10 أشخاص من الفئة المستهدفة. اعرض عليهم نموذجًا واضحًا واسألهم عن المشكلة الحالية، ثم جرّب بيعًا حقيقيًا محدودًا بدل الاكتفاء بسؤالهم هل الفكرة حلوة. سجّل الاعتراضات وأسباب الشراء."+context;
- if(/منافس|بديل|السوق/.test(t))return "ابحث عن 3 إلى 5 بدائل يستخدمها العميل حاليًا. قارن السعر والجودة وسرعة الخدمة والموقع وطريقة البيع. اسأل نفسك: لماذا سيختارك العميل بدلًا من البديل؟ لا تفترض أن عدم معرفتك بمنافس يعني عدم وجود منافسين.";
- if(/ميزاني|فلوس|رأس مال/.test(t))return "قسّم الميزانية إلى: تكلفة التأسيس، تكلفة التشغيل لأول فترة، التسويق، ومبلغ احتياطي للطوارئ. ابدأ بأصغر تجربة تثبت وجود طلب، ولا تنفق كامل الميزانية قبل اختبار الفكرة."+context;
- if(/تسويق|إعلان|سوشيال/.test(t))return "ابدأ بتحديد العميل ومكان وجوده. جهز رسالة بسيطة تشرح المشكلة والحل والسعر، وانشر محتوى يوضح المنتج، ثم اختبر قناة واحدة أو اثنتين بميزانية صغيرة وقِس عدد الاستفسارات والمبيعات.";
- if(/خطر|مشكلة|مخاطر/.test(t))return "اكتب أهم 3 افتراضات ممكن تفشل: هل العميل محتاج المنتج؟ هل السعر مناسب؟ هل تقدر توفره بجودة ثابتة؟ اختبر كل افتراض بتجربة صغيرة قبل الالتزام بمصاريف كبيرة.";
- if(/خطوة|أبدأ|ابدأ|أعمل إيه/.test(t))return "الخطوة التالية: حدد عميلًا واحدًا واضحًا، واكتب المشكلة التي يعاني منها، ثم قابل 5 أشخاص من نفس الفئة. لا تبدأ بشراء معدات أو دفع إيجار قبل اختبار الطلب."+context;
- return "خلّينا نفك السؤال لخطوات. وضّح لي: مين العميل؟ إيه المشكلة اللي بتحلها؟ وإيه اللي جربته لحد دلوقتي؟ أقدر أساعدك ترتب الفكرة وتحدد تجربة عملية صغيرة. "+context;
-}
-function send(){
- const q=$("chatInput").value.trim();if(!q)return;
- addMessage(q,"user");$("chatInput").value="";
- addMessage(assistantReply(q),"bot");
-}
-document.querySelectorAll("[data-page]").forEach(b=>b.onclick=()=>showPage(b.dataset.page));
-document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>showPage(b.dataset.go));
-$("newProject").onclick=startNew;$("homeNew").onclick=startNew;$("projectsNew").onclick=startNew;
-$("next").onclick=next;
-$("prev").onclick=()=>{capture();if(project.step>0)project.step--;renderWizard();upsert()};
-$("finish").onclick=report;
-$("saveProgress").onclick=()=>{capture();upsert();alert("تم حفظ تقدم مشروعك.")};
-$("reportEdit").onclick=()=>{project.step=0;renderWizard();showPage("wizard")};
-$("reportSave").onclick=()=>{upsert();alert("مشروعك محفوظ.")};
-$("reportChat").onclick=()=>showPage("assistant");
-$("send").onclick=send;
-$("chatInput").addEventListener("keydown",e=>{if(e.key==="Enter")send()});
-document.querySelectorAll(".quick").forEach(b=>b.onclick=()=>{$("chatInput").value=b.dataset.q;send()});
-load();refreshHome();renderProjects();
-})();
-</script>
-</body>
-</html>
+ const answered=steps.filter(s=>String(a[s.key]||"").trim());
+ const missing=steps.filter(s=>!String(a[s.key]||"").trim());
+
+ const strengths=[];
+ const gaps=[];
+ const risks=[];
+
+ if(a.idea)strengths.push("تم توضيح فكرة المشروع بصورة مبدئية.");
+ if(a.problem)strengths.push("تم تحديد المشكلة التي يحاول المشروع حلها.");
+ if(a.customer)strengths.push("هناك تصور أولي للفئة المستهدفة.");
+ if(a.solution)strengths.push("تم وصف الحل أو القيمة التي سيقدمها المشروع.");
+ if(a.resources)strengths.push("تم تسجيل بعض الموارد أو الإمكانيات المتاحة.");
+
+ if(!a.customer)gaps.push("الفئة المستهدفة لم يتم تحديدها بشكل كافٍ.");
+ if(!a.competitors)gaps.push("المنافسون والبدائل يحتاجون إلى بحث فعلي.");
+ if(!a.budget)gaps.push("الميزانية المتاحة لم يتم تحديدها.");
+ if(!a.price)gaps.push("السعر المتوقع يحتاج إلى حساب تكلفة ومقارنة بالسوق.");
+ if(!a.marketing)gaps.push("قناة الوصول إلى العملاء تحتاج إلى تحديد.");
+ if(!a.resources)gaps.push("الموارد والمهارات المطلوبة تحتاج إلى حصر.");
+
+ if(!a.customer)risks.push("احتمال استهداف جمهور غير مناسب أو واسع أكثر من اللازم.");
+ if(!a.competitors)risks.push("احتمال وجود بدائل أو منافسين لم يتم التعرف عليهم.");
+ if(!a.budget)risks.push("احتمال البدء بمصاريف أكبر من القدرة المالية.");
+ if(!a.price)risks.push("احتمال تسعير المنتج بأقل من تكلفته أو بسعر لا يقبله العميل.");
+ if(!a.problem)risks.push("قد لا تكون المشكلة التي يعالجها المشروع واضحة بما يكفي.");
+
+ if(!strengths.length)strengths.push("لم تتوفر إجابات كافية لتحديد نقاط قوة واضحة حتى الآن.");
+ if(!gaps.length)gaps.push("تمت الإجابة عن المراحل كلها، لكن ما زال يلزم التحقق من المعلومات بالتجربة.");
+ if(!risks.length)risks.push("لا يمكن اعتبار المخاطر منتهية؛ يجب اختبار الطلب والتكلفة والجودة قبل التوسع.");
+
+ const answerHtml=steps.map(s=>`
+ <div class="answerbox">
+ <b>${esc(s.title)}</b><br>
+ ${esc(a[s.key]||"لم تتم الإجابة بعد")}
+ </div>`).join("");
+
+ const listHtml=arr=>arr.map(x=>`<li>${esc(x)}</li>`).join("");
+
+ $("reportDate").textContent="تاريخ إنشاء التقرير: "+new Date().toLocaleDateString("ar-EG");
+
+ $("reportContent").innerHTML=`
+ <div class="report-section">
+  <h2>ملخص المشروع</h2>
+  <p><b>الفكرة:</b> ${esc(a.idea||"لم يتم تحديد الفكرة بعد")}</p>
+  <p><b>عدد المراحل التي تمت الإجابة عنها:</b> ${answered.length} من ${steps.length}</p>
+  <p><b>المراحل التي تحتاج استكمالًا:</b> ${missing.length}</p>
+ </div>
+
+ <div class="report-section report-good">
+  <h2>نقاط القوة الحالية</h2>
+  <ul>${listHtml(strengths)}</ul>
+ </div>
+
+ <div class="report-section report-warning">
+  <h2>الفجوات والبيانات التي تحتاج استكمالًا</h2>
+  <ul>${listHtml(gaps)}</ul>
+ </div>
+
+ <div class="report-section report-risk">
+  <h2>المخاطر التي تستحق الانتباه</h2>
+  <ul>${listHtml(risks)}</ul>
+ </div>
+
+ <div class="report-section">
+  <h2>إجابات مراحل المشروع</h2>
+  ${answerHtml}
+ </div>
+
+ <div class="report-section">
+  <h2>خطة أول 30 يومًا</h2>
+  <h3>الأسبوع الأول: فهم العميل والمشكلة</h3>
+  <ul>
+   <li>حدد وصفًا واضحًا للعميل الذي تريد خدمته.</li>
+   <li>تحدث مع خمسة أشخاص على الأقل من الفئة المستهدفة.</li>
+   <li>اسألهم كيف يتعاملون حاليًا مع المشكلة وما الذي يزعجهم في الحلول الموجودة.</li>
+  </ul>
+
+  <h3>الأسبوع الثاني: دراسة البدائل وتجربة الحل</h3>
+  <ul>
+   <li>اجمع معلومات عن ثلاثة بدائل أو منافسين على الأقل إن وُجدوا.</li>
+   <li>قارن طريقة العمل والسعر والجودة والخدمة، بناءً على معلومات فعلية.</li>
+   <li>جهز نموذجًا أوليًا بسيطًا أو وصفًا واضحًا للحل واعرضه على العملاء المحتملين.</li>
+  </ul>
+
+  <h3>الأسبوع الثالث: التكلفة والسعر</h3>
+  <ul>
+   <li>احسب تكلفة تقديم المنتج أو الخدمة بالتفصيل.</li>
+   <li>افصل بين تكاليف التأسيس والمصاريف التشغيلية والمصاريف المتغيرة.</li>
+   <li>اختبر مدى تقبل العملاء للسعر المقترح قبل الالتزام بمصاريف كبيرة.</li>
+  </ul>
+
+  <h3>الأسبوع الرابع: تجربة بيع وتحسين</h3>
+  <ul>
+   <li>نفذ تجربة صغيرة ومحدودة للوصول إلى أول عملاء.</li>
+   <li>سجل الاستفسارات والطلبات والاعتراضات والنتائج الفعلية.</li>
+   <li>قرر ما الذي يحتاج تعديلًا قبل التوسع أو زيادة الإنفاق.</li>
+  </ul>
+ </div>
+
+ <div class="notice">
+  هذا التقرير إرشادي مبني على إجاباتك فقط. لا يمثل دراسة جدوى مالية أو دراسة سوق موثقة، ولا يفترض أسعارًا أو تكاليف أو حجم طلب دون بيانات فعلية. تحقق من الأرقام والعروض والأسعار من مصادرها قبل اتخاذ قرارات مالية.
+ </div>
+ `;
+
+ 
