@@ -67,7 +67,7 @@ function render(){
   $("answer").value=a[q[2]]||"";
   $("back").disabled=i===0;
   $("next").textContent=i===4?"اعرض خطتي المبدئية":"التالي";
-}
+  
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 function result(){ $("wizard").classList.add("hidden");$("result").classList.remove("hidden");$("summary").innerHTML=`<div class="summary"><b>الفكرة:</b> ${esc(a.idea)}<br><b>العميل:</b> ${esc(a.customer)}<br><b>المكان:</b> ${esc(a.place)}<br><b>الميزانية:</b> ${esc(a.budget)}<br><b>المتاح:</b> ${esc(a.resources)}</div>`;let p=[["اختبر احتياج العميل","اتكلم مع 5 أشخاص من الفئة المستهدفة. اسألهم عن المشكلة وآخر مرة واجهوها وهل دفعوا لحلها قبل كده."],["اعرف البدائل والمنافسين","ابحث عن 3 بدائل بيستخدمها العميل حاليًا. قارن السعر والجودة وسهولة الوصول بدل ما تفترض إن مفيش منافسين."],["اعمل تجربة صغيرة","جهّز عينة أو نموذجًا بسيطًا واعرضه على عدد محدود. ما تبدأش بمخزون أو مصاريف كبيرة قبل اختبار الاهتمام."],["احسب تكلفة الوحدة","اكتب تكلفة الخامات والتغليف والتوصيل والوقت والمصاريف الثابتة، ثم اختبر سعرًا يقبله العميل ويغطي التكلفة."],["راجع النتيجة وقرر","سجّل عدد المهتمين والتجارب والمبيعات والاعتراضات. عدّل العرض بناءً على الدليل قبل التوسع."]];$("plan").innerHTML="<h2>خطة البداية المقترحة</h2>"+p.map((x,n)=>`<div class="step"><b>${n+1}. ${x[0]}</b><small>${x[1]}</small></div>`).join("")}
 function saved(){let v=[];try{v=JSON.parse(localStorage.getItem("fikratak_guided_projects_v1")||"[]")}catch(e){}$("saved").innerHTML=v.length?v.map(x=>`<div class="summary"><b>${esc(x.idea)}</b><br><small>${esc(x.place)} — ${esc(x.budget)}</small></div>`).join(""):'<p class="muted">لسه مفيش مشروعات محفوظة.</p>'}
