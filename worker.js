@@ -4,7 +4,7 @@
  *   OPENAI_API_KEY (secret)
  *   ALLOWED_ORIGIN (e.g. https://ag8991852-ship-it.github.io)
  * Optional vars:
- *   OPENAI_MODEL (default gpt-6-astra)
+ *   OPENAI_MODEL (default gpt-6-luna)
  */
 const SYSTEM_PROMPT = `أنت عقل فِكرتك، مستشار مشروعات باللغة العربية المصرية الواضحة.
 ساعد أصحاب الأفكار والمشروعات الصغيرة على فهم المشكلة والعميل والحل والتسعير والتسويق والتشغيل.
@@ -53,7 +53,7 @@ export default {
     method:"POST",
     headers:{"Authorization":"Bearer "+env.OPENAI_API_KEY,"Content-Type":"application/json"},
     body:JSON.stringify({
-     model:env.OPENAI_MODEL||"gpt-6-astra",
+     model:env.OPENAI_MODEL||"gpt-6-luna",
      instructions:SYSTEM_PROMPT,
      input,
      max_output_tokens:900,
