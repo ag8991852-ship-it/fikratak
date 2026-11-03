@@ -1,276 +1,519 @@
-<!doctype html>
+
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#101b35">
-<title>فِكرتك | من الفكرة لأول عميل</title>
+<title>فِكرتك | فكرتك تستاهل تبقى حقيقة</title>
+
 <style>
-:root{--n:#101b35;--g:#e9b95b;--bg:#f5f6f8;--ink:#172033;--muted:#697386;--line:#e4e8ef}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.7 Tahoma,Arial,sans-serif}
-header{background:linear-gradient(135deg,var(--n),#20375e);color:white;padding:22px 18px 32px}
-.wrap{max-width:850px;margin:auto}
-.nav{display:flex;justify-content:space-between;gap:12px;align-items:center}
-.brand{font-size:23px;font-weight:bold}
-.brand span{color:var(--g)}
-.tag{font-size:12px;color:#d7deea}
-.hero{padding:30px 0 5px}
-.hero h1{font-size:clamp(27px,5vw,40px);line-height:1.3;margin:0 0 8px}
-.hero p{color:#dbe3ef;margin:0}
-main{max-width:850px;margin:0 auto 40px;padding:0 15px}
-.panel{background:white;border:1px solid var(--line);border-radius:17px;padding:22px;margin:18px 0;box-shadow:0 8px 26px #15233b0b}
-.progress{display:flex;justify-content:space-between;color:var(--muted);font-size:13px}
-.bar{height:7px;background:#edf0f4;border-radius:9px;margin:10px 0 22px;overflow:hidden}
-.bar i{display:block;height:100%;background:var(--g);width:20%;transition:width .2s}
-h2{font-size:21px;margin:0 0 8px}
-.hint,.muted{color:var(--muted);font-size:14px}
-label{display:block;font-weight:bold;margin:12px 0 7px}
-input,textarea,select{display:block;width:100%;padding:13px;border:1px solid #d8dee8;border-radius:10px;font:inherit;background:#fff;color:var(--ink)}
-input:focus,textarea:focus,select:focus{outline:2px solid #e9b95b;outline-offset:1px}
-textarea{min-height:100px;resize:vertical}
-.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
-.btn{border:0;border-radius:10px;padding:12px 18px;font:inherit;font-weight:bold;cursor:pointer}
-.primary{background:var(--n);color:white}
-.secondary{background:#edf0f5;color:var(--n)}
-.gold{background:var(--g);color:#1b2434}
-.btn:disabled{opacity:.45;cursor:not-allowed}
-.hidden{display:none!important}
-.summary{background:#f8f9fb;border:1px solid var(--line);padding:13px;border-radius:11px;margin:10px 0;overflow-wrap:anywhere}
-.step{border-right:3px solid var(--g);padding:2px 13px 13px;margin:12px 0}
-.step b{display:block}
-.step small{color:var(--muted);font-size:14px}
-.note{font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:14px;margin-top:20px}
-footer{text-align:center;color:var(--muted);font-size:12px;padding:20px}
-@media(max-width:560px){.panel{padding:17px}.nav{align-items:flex-start;flex-direction:column}}
+:root {
+  --navy:#101b35;
+  --gold:#e9b95b;
+  --bg:#f4f6fa;
+  --text:#172033;
+  --muted:#697386;
+  --line:#e3e8f0;
+}
+* { box-sizing:border-box; }
+body {
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:Tahoma,Arial,sans-serif;
+  line-height:1.8;
+}
+header {
+  background:linear-gradient(135deg,#101b35,#29436e);
+  color:white;
+  padding:24px 18px 38px;
+}
+.container {
+  width:min(850px, calc(100% - 30px));
+  margin:auto;
+}
+.top {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+}
+.logo { font-size:26px; font-weight:bold; }
+.logo span { color:var(--gold); }
+.tag { color:#dce5f4; font-size:13px; }
+.hero { padding-top:28px; }
+.hero h1 {
+  font-size:clamp(27px,5vw,40px);
+  line-height:1.4;
+  margin:0 0 8px;
+}
+.hero p { color:#dce5f4; margin:0; }
+
+main {
+  width:min(850px, calc(100% - 30px));
+  margin:22px auto 40px;
+}
+.card {
+  background:white;
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:24px;
+  margin-bottom:18px;
+  box-shadow:0 8px 26px #14213b0b;
+}
+.progress-info {
+  display:flex;
+  justify-content:space-between;
+  color:var(--muted);
+  font-size:13px;
+}
+.track {
+  height:8px;
+  background:#edf0f5;
+  border-radius:20px;
+  overflow:hidden;
+  margin:10px 0 24px;
+}
+.track div {
+  height:100%;
+  width:20%;
+  background:var(--gold);
+  transition:width .2s;
+}
+h2 { margin:0 0 8px; font-size:22px; }
+.hint,.muted {
+  color:var(--muted);
+  font-size:14px;
+}
+label {
+  display:block;
+  font-weight:bold;
+  margin:14px 0 7px;
+}
+input,textarea,select {
+  display:block;
+  width:100%;
+  min-height:54px;
+  padding:13px 14px;
+  border:1px solid #cfd7e3;
+  border-radius:12px;
+  background:white;
+  color:var(--text);
+  font:16px Tahoma,Arial,sans-serif;
+}
+textarea {
+  min-height:130px;
+  resize:vertical;
+}
+input:focus,textarea:focus,select:focus {
+  outline:3px solid #f4d99d;
+  border-color:#b8872d;
+}
+.actions {
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:20px;
+}
+button {
+  border:0;
+  border-radius:11px;
+  padding:12px 20px;
+  font: bold 15px Tahoma,Arial,sans-serif;
+  cursor:pointer;
+}
+button:disabled { opacity:.4; cursor:not-allowed; }
+.primary { background:var(--navy); color:white; }
+.secondary { background:#edf1f6; color:var(--navy); }
+.gold { background:var(--gold); color:#222; }
+.hidden { display:none !important; }
+.summary {
+  background:#f8f9fc;
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:14px;
+  margin:12px 0;
+  overflow-wrap:anywhere;
+}
+.plan-step {
+  border-right:4px solid var(--gold);
+  padding:3px 13px 12px;
+  margin:14px 0;
+}
+.plan-step p {
+  color:var(--muted);
+  font-size:14px;
+  margin:3px 0;
+}
+.note {
+  border-top:1px solid var(--line);
+  padding-top:13px;
+  margin-top:20px;
+  color:var(--muted);
+  font-size:12px;
+}
+footer {
+  text-align:center;
+  color:var(--muted);
+  font-size:12px;
+  padding:20px;
+}
+@media(max-width:560px) {
+  .top { align-items:flex-start; flex-direction:column; }
+  .card { padding:17px; }
+  .actions button { flex:1; }
+}
 </style>
 </head>
+
 <body>
+
 <header>
-  <div class="wrap">
-    <div class="nav">
-      <div class="brand">فِكرتك<span>.</span></div>
-      <div class="tag">فكرتك تستاهل تبقى حقيقة</div>
+  <div class="container">
+    <div class="top">
+      <div class="logo">فِكرتك<span>.</span></div>
+      <div class="tag">منصة عربية لكل أصحاب الأفكار والمشروعات</div>
     </div>
+
     <section class="hero">
-      <h1>من الفكرة لأول عميل</h1>
-      <p>خلّينا نفهم فكرتك ونحوّلها لأول خطوات عملية، سؤال بسؤال ومن غير تعقيد.</p>
+      <h1>فكرتك تستاهل تبقى حقيقة</h1>
+      <p>من الفكرة لأول عميل — خلّينا نحوّل فكرتك لخطوات عملية.</p>
     </section>
   </div>
 </header>
 
 <main>
-  <section class="panel" id="wizard">
-    <div class="progress">
+
+  <section class="card" id="wizard">
+    <div class="progress-info">
       <span id="stepLabel">الخطوة 1 من 5</span>
       <span id="percent">20%</span>
     </div>
-    <div class="bar"><i id="bar"></i></div>
-    <div id="question"></div>
-    <div class="actions">
-      <button class="btn secondary" id="back" type="button" disabled>رجوع</button>
-      <button class="btn primary" id="next" type="button">التالي</button>
+
+    <div class="track">
+      <div id="progressBar"></div>
     </div>
+
+    <div id="questionArea">
+      <h2>احكيلي عن فكرتك</h2>
+      <p class="hint">اكتب فكرتك ببساطة، حتى لو لسه مش واضحة.</p>
+      <label for="answer">فكرتك إيه؟</label>
+      <textarea id="answer" placeholder="مثال: عايز أعمل مشروع أكل بيتي للموظفين..."></textarea>
+    </div>
+
+    <div class="actions">
+      <button class="secondary" id="back" type="button" disabled>رجوع</button>
+      <button class="primary" id="next" type="button">التالي</button>
+    </div>
+
+    <p class="note">
+      اكتب إجابتك في الخانة الظاهرة ثم اضغط التالي.
+      تقدر ترجع وتعدّل إجاباتك في أي وقت.
+    </p>
   </section>
 
-  <section class="panel hidden" id="result">
+  <section class="card hidden" id="result">
     <h2>ملخص فكرتك وخطوتك الجاية</h2>
     <div id="summary"></div>
     <div id="plan"></div>
+
     <div class="actions">
-      <button class="btn gold" id="save" type="button">احفظ على هذا الجهاز</button>
-      <button class="btn secondary" id="edit" type="button">عدّل إجاباتي</button>
-      <button class="btn secondary" id="fresh" type="button">ابدأ فكرة جديدة</button>
+      <button class="gold" id="save" type="button">احفظ المشروع</button>
+      <button class="secondary" id="edit" type="button">عدّل إجاباتي</button>
+      <button class="secondary" id="fresh" type="button">ابدأ فكرة جديدة</button>
     </div>
-    <p class="note">تنبيه: هذه نسخة أولية إرشادية تعمل بقواعد ثابتة داخل الصفحة. ليست مستشار ذكاء اصطناعي، ولا تجري بحث سوق مباشرًا أو دراسة جدوى موثقة. تحقّق من الأسعار والتراخيص محليًا قبل أي قرار مالي.</p>
+
+    <p class="note">
+      هذه نسخة إرشادية أولية تعمل بقواعد ثابتة، وليست مستشار ذكاء اصطناعي
+      أو دراسة جدوى موثقة، ولا تجري بحث سوق مباشرًا.
+    </p>
   </section>
 
-  <section class="panel">
+  <section class="card">
     <h2>مشروعاتك المحفوظة</h2>
-    <p class="muted">الحفظ متاح على نفس المتصفح والجهاز فقط.</p>
+    <p class="muted">المشروعات محفوظة على نفس المتصفح والجهاز.</p>
     <div id="saved"></div>
-    <button class="btn secondary" id="clear" type="button">مسح المحفوظات</button>
+    <button class="secondary" id="clear" type="button">مسح المحفوظات</button>
   </section>
+
 </main>
 
-<footer>فِكرتك — منصة عربية لكل أصحاب الأفكار والمشروعات</footer>
+<footer>فِكرتك — فكرتك تستاهل تبقى حقيقة</footer>
 
 <script>
 "use strict";
 
-const questions = [
-  ["احكيلي عن فكرتك","اكتبها ببساطة حتى لو لسه مش واضحة. إيه المنتج أو الخدمة اللي بتفكر تقدمها؟","idea","textarea","مثال: عايز أعمل مشروع أكل بيتي للموظفين..."],
-  ["مين العميل اللي محتاجها؟","فكّر في الشخص اللي ممكن يدفع مقابل المنتج أو الخدمة.","customer","textarea","مثال: موظفين في الشركات القريبة مني..."],
-  ["هتبدأ منين؟","حدد المدينة أو المنطقة، أو اكتب إن المشروع أونلاين.","place","text","مثال: مدينة نصر / أونلاين..."],
-  ["ميزانيتك المبدئية كام؟","اختار أقرب نطاق، ولو مش عارف اختار غير محددة.","budget","select",""],
-  ["إيه المتاح عندك حاليًا؟","اكتب خبرتك أو مهاراتك وقد إيه تقدر تخصص وقت للمشروع.","resources","textarea","مثال: بعرف أطبخ وعندي ساعتين يوميًا..."]
+(() => {
+
+const steps = [
+  {
+    title:"احكيلي عن فكرتك",
+    hint:"اكتبها ببساطة. إيه المنتج أو الخدمة اللي بتفكر تقدمها؟",
+    key:"idea",
+    type:"textarea",
+    placeholder:"مثال: مشروع أكل بيتي للموظفين..."
+  },
+  {
+    title:"مين العميل اللي محتاجها؟",
+    hint:"مين الشخص اللي ممكن يشتري المنتج أو الخدمة؟",
+    key:"customer",
+    type:"textarea",
+    placeholder:"مثال: الموظفين والطلاب..."
+  },
+  {
+    title:"هتبدأ منين؟",
+    hint:"حدد المدينة أو المنطقة، أو اكتب إن المشروع أونلاين.",
+    key:"place",
+    type:"text",
+    placeholder:"مثال: مدينة نصر / أونلاين..."
+  },
+  {
+    title:"ميزانيتك المبدئية كام؟",
+    hint:"اختار أقرب ميزانية متاحة ليك.",
+    key:"budget",
+    type:"select",
+    options:[
+      "أقل من 5,000 جنيه",
+      "5,000 إلى 20,000 جنيه",
+      "20,000 إلى 50,000 جنيه",
+      "أكثر من 50,000 جنيه",
+      "لسه مش محددة"
+    ]
+  },
+  {
+    title:"إيه المتاح عندك حاليًا؟",
+    hint:"اكتب مهاراتك وخبرتك والوقت المتاح للمشروع.",
+    key:"resources",
+    type:"textarea",
+    placeholder:"مثال: عندي خبرة في الطبخ وساعتين يوميًا..."
+  }
 ];
 
-const budgetOptions = [
-  "أقل من 5,000 جنيه",
-  "5,000 إلى 20,000 جنيه",
-  "20,000 إلى 50,000 جنيه",
-  "أكثر من 50,000 جنيه",
-  "لسه مش محددة"
-];
+let answers = {
+  idea:"",
+  customer:"",
+  place:"",
+  budget:"",
+  resources:""
+};
 
-let answers = {idea:"", customer:"", place:"", budget:"", resources:""};
-let currentStep = 0;
+let current = 0;
 
-const byId = id => document.getElementById(id);
+const $ = id => document.getElementById(id);
 
 function escapeHTML(value) {
-  return String(value).replace(/[&<>"']/g, char => ({
-    "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
+  return String(value ?? "").replace(/[&<>"']/g, char => ({
+    "&":"&amp;",
+    "<":"&lt;",
+    ">":"&gt;",
+    '"':"&quot;",
+    "'":"&#39;"
   })[char]);
 }
 
 function render() {
-  const q = questions[currentStep];
-  byId("stepLabel").textContent = `الخطوة ${currentStep + 1} من 5`;
-  byId("percent").textContent = `${(currentStep + 1) * 20}%`;
-  byId("bar").style.width = `${(currentStep + 1) * 20}%`;
+  const step = steps[current];
 
-  let fieldHTML = "";
-  if (q[3] === "select") {
-    fieldHTML = `
+  $("stepLabel").textContent =
+    `الخطوة ${current + 1} من ${steps.length}`;
+
+  $("percent").textContent =
+    `${(current + 1) * 20}%`;
+
+  $("progressBar").style.width =
+    `${(current + 1) * 20}%`;
+
+  let field = "";
+
+  if (step.type === "select") {
+    field = `
       <select id="answer">
         <option value="">اختار الميزانية</option>
-        ${budgetOptions.map(option =>
+        ${step.options.map(option =>
           `<option value="${escapeHTML(option)}">${escapeHTML(option)}</option>`
         ).join("")}
       </select>`;
-  } else if (q[3] === "text") {
-    fieldHTML = `<input id="answer" type="text" autocomplete="address-level2"
-      placeholder="${escapeHTML(q[4])}">`;
+  } else if (step.type === "text") {
+    field = `
+      <input
+        id="answer"
+        type="text"
+        autocomplete="off"
+        placeholder="${escapeHTML(step.placeholder)}"
+      >`;
   } else {
-    fieldHTML = `<textarea id="answer" placeholder="${escapeHTML(q[4])}">${escapeHTML(answers[q[2]] || "")}</textarea>`;
+    field = `
+      <textarea
+        id="answer"
+        placeholder="${escapeHTML(step.placeholder)}"
+      >${escapeHTML(answers[step.key])}</textarea>`;
   }
 
-  byId("question").innerHTML = `
-    <h2>${escapeHTML(q[0])}</h2>
-    <p class="hint">${escapeHTML(q[1])}</p>
+  $("questionArea").innerHTML = `
+    <h2>${escapeHTML(step.title)}</h2>
+    <p class="hint">${escapeHTML(step.hint)}</p>
     <label for="answer">إجابتك</label>
-    ${fieldHTML}`;
+    ${field}
+  `;
 
-  byId("answer").value = answers[q[2]] || "";
-  byId("back").disabled = currentStep === 0;
-  byId("next").textContent = currentStep === 4 ? "اعرض خطتي المبدئية" : "التالي";
+  $("answer").value = answers[step.key] || "";
+  $("back").disabled = current === 0;
+
+  $("next").textContent =
+    current === steps.length - 1
+      ? "اعرض خطتي المبدئية"
+      : "التالي";
 }
 
-function readCurrentAnswer() {
-  const field = byId("answer");
-  const value = field ? field.value.trim() : "";
+function captureAnswer() {
+  const field = $("answer");
+  const value = field.value.trim();
+
   if (!value) {
-    if (field) field.focus();
-    return null;
+    field.focus();
+    return false;
   }
-  answers[questions[currentStep][2]] = value;
-  return value;
+
+  answers[steps[current].key] = value;
+  return true;
 }
 
 function showResult() {
-  byId("wizard").classList.add("hidden");
-  byId("result").classList.remove("hidden");
+  $("wizard").classList.add("hidden");
+  $("result").classList.remove("hidden");
 
-  byId("summary").innerHTML = `
+  $("summary").innerHTML = `
     <div class="summary">
       <b>الفكرة:</b> ${escapeHTML(answers.idea)}<br>
       <b>العميل:</b> ${escapeHTML(answers.customer)}<br>
       <b>المكان:</b> ${escapeHTML(answers.place)}<br>
       <b>الميزانية:</b> ${escapeHTML(answers.budget)}<br>
       <b>المتاح:</b> ${escapeHTML(answers.resources)}
-    </div>`;
+    </div>
+  `;
 
-  const plan = [
-    ["اختبر احتياج العميل","اتكلم مع 5 أشخاص من الفئة المستهدفة. اسألهم عن المشكلة وآخر مرة واجهوها وهل دفعوا لحلها قبل كده."],
-    ["اعرف البدائل والمنافسين","ابحث عن 3 بدائل بيستخدمها العميل حاليًا. قارن السعر والجودة وسهولة الوصول بدل ما تفترض إن مفيش منافسين."],
-    ["اعمل تجربة صغيرة","جهّز عينة أو نموذجًا بسيطًا واعرضه على عدد محدود. ما تبدأش بمخزون أو مصاريف كبيرة قبل اختبار الاهتمام."],
-    ["احسب تكلفة الوحدة","اكتب تكلفة الخامات والتغليف والتوصيل والوقت والمصاريف الثابتة، ثم اختبر سعرًا يقبله العميل ويغطي التكلفة."],
-    ["راجع النتيجة وقرر","سجّل عدد المهتمين والتجارب والمبيعات والاعتراضات. عدّل العرض بناءً على الدليل قبل التوسع."]
+  const tasks = [
+    ["اختبر احتياج العميل","اتكلم مع 5 أشخاص من الفئة المستهدفة واسألهم عن المشكلة والحلول الحالية."],
+    ["ادرس البدائل","حدد 3 بدائل أو منافسين وقارن السعر والجودة وسهولة الوصول."],
+    ["نفّذ تجربة صغيرة","جهّز نموذجًا بسيطًا واعرضه على عدد محدود قبل إنفاق مبلغ كبير."],
+    ["احسب التكلفة","احسب تكلفة المنتج والتغليف والتوصيل والوقت والمصاريف الثابتة."],
+    ["راجع النتائج","سجّل الاهتمام والتجارب والمبيعات والاعتراضات، ثم قرر الخطوة التالية."]
   ];
 
-  byId("plan").innerHTML = "<h2>خطة البداية المقترحة</h2>" +
-    plan.map((item, index) => `
-      <div class="step">
-        <b>${index + 1}. ${escapeHTML(item[0])}</b>
-        <small>${escapeHTML(item[1])}</small>
-      </div>`).join("");
+  $("plan").innerHTML =
+    "<h2>خطة البداية المقترحة</h2>" +
+    tasks.map((task,index) => `
+      <div class="plan-step">
+        <b>${index + 1}. ${escapeHTML(task[0])}</b>
+        <p>${escapeHTML(task[1])}</p>
+      </div>
+    `).join("");
 }
 
-function getSavedProjects() {
+function getSaved() {
   try {
-    const value = JSON.parse(localStorage.getItem("fikratak_guided_projects_v1") || "[]");
-    return Array.isArray(value) ? value : [];
-  } catch (error) {
+    const list = JSON.parse(
+      localStorage.getItem("fikratak_projects_v1") || "[]"
+    );
+    return Array.isArray(list) ? list : [];
+  } catch {
     return [];
   }
 }
 
 function renderSaved() {
-  const projects = getSavedProjects();
-  byId("saved").innerHTML = projects.length
-    ? projects.map(project => `
+  const list = getSaved();
+
+  $("saved").innerHTML = list.length
+    ? list.map(project => `
         <div class="summary">
-          <b>${escapeHTML(project.idea || "مشروع بدون عنوان")}</b><br>
-          <small>${escapeHTML(project.place || "")} — ${escapeHTML(project.budget || "")}</small>
-        </div>`).join("")
+          <b>${escapeHTML(project.idea || "مشروع جديد")}</b><br>
+          <span class="muted">
+            ${escapeHTML(project.place || "")}
+            — ${escapeHTML(project.budget || "")}
+          </span>
+        </div>
+      `).join("")
     : '<p class="muted">لسه مفيش مشروعات محفوظة.</p>';
 }
 
-byId("next").addEventListener("click", () => {
-  if (readCurrentAnswer() === null) return;
-  if (currentStep < questions.length - 1) {
-    currentStep++;
+$("next").addEventListener("click", () => {
+  if (!captureAnswer()) return;
+
+  if (current < steps.length - 1) {
+    current++;
     render();
   } else {
     showResult();
   }
 });
 
-byId("back").addEventListener("click", () => {
-  const field = byId("answer");
-  if (field) answers[questions[currentStep][2]] = field.value.trim();
-  if (currentStep > 0) currentStep--;
+$("back").addEventListener("click", () => {
+  answers[steps[current].key] = $("answer").value.trim();
+
+  if (current > 0) current--;
+
   render();
 });
 
-byId("edit").addEventListener("click", () => {
-  byId("result").classList.add("hidden");
-  byId("wizard").classList.remove("hidden");
-  currentStep = 0;
+$("edit").addEventListener("click", () => {
+  $("result").classList.add("hidden");
+  $("wizard").classList.remove("hidden");
+  current = 0;
   render();
 });
 
-byId("fresh").addEventListener("click", () => {
-  answers = {idea:"", customer:"", place:"", budget:"", resources:""};
-  currentStep = 0;
-  byId("result").classList.add("hidden");
-  byId("wizard").classList.remove("hidden");
+$("fresh").addEventListener("click", () => {
+  answers = {
+    idea:"",
+    customer:"",
+    place:"",
+    budget:"",
+    resources:""
+  };
+
+  current = 0;
+
+  $("result").classList.add("hidden");
+  $("wizard").classList.remove("hidden");
+
   render();
 });
 
-byId("save").addEventListener("click", () => {
-  const projects = getSavedProjects();
-  projects.unshift({...answers, date:new Date().toISOString()});
+$("save").addEventListener("click", () => {
   try {
-    localStorage.setItem("fikratak_guided_projects_v1", JSON.stringify(projects));
+    const list = getSaved();
+
+    list.unshift({
+      ...answers,
+      date:new Date().toISOString()
+    });
+
+    localStorage.setItem(
+      "fikratak_projects_v1",
+      JSON.stringify(list)
+    );
+
     renderSaved();
-    byId("save").textContent = "اتحفظ";
-  } catch (error) {
-    alert("المتصفح مش قادر يحفظ البيانات. راجع مساحة التخزين أو إعدادات المتصفح.");
+    $("save").textContent = "تم الحفظ";
+  } catch {
+    alert("تعذر الحفظ على هذا الجهاز. راجع إعدادات المتصفح.");
   }
 });
 
-byId("clear").addEventListener("click", () => {
-  if (confirm("تمسح كل المشروعات المحفوظة على الجهاز؟")) {
-    localStorage.removeItem("fikratak_guided_projects_v1");
+$("clear").addEventListener("click", () => {
+  if (confirm("هل تريد مسح كل المشروعات المحفوظة؟")) {
+    localStorage.removeItem("fikratak_projects_v1");
     renderSaved();
   }
 });
 
 render();
 renderSaved();
+
+})();
 </script>
+
 </body>
 </html>
