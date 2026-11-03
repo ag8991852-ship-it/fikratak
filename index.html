@@ -399,5 +399,62 @@ function ftImportProjects() {
 
 ftRenderWeek();
     </script>
+
+<!-- عقل فِكرتك - مساعد ذكاء اصطناعي -->
+<section class="panel no-print" id="aqelFikratak" aria-labelledby="aqelTitle">
+  <h2 id="aqelTitle">🧠 عقل فِكرتك</h2>
+  <p class="muted">مساعدك الذكي لتطوير مشروعك خطوة بخطوة. لا تضع بيانات شخصية أو أسرارًا تجارية حساسة.</p>
+  <div id="aqelChat" role="log" aria-live="polite" style="display:grid;gap:10px;margin:14px 0">
+    <div style="background:#e7f3ee;padding:12px;border-radius:12px">أهلًا بيك! احكيلي عن مشروعك أو اسألني عن الفكرة والتسعير والتسويق وخطوات التنفيذ.</div>
+  </div>
+  <label for="aqelMessage">رسالتك</label>
+  <textarea id="aqelMessage" maxlength="4000" placeholder="مثلاً: عندي فكرة مشروع أكل بيتي وعايز أبدأ بميزانية محدودة..."></textarea>
+  <div class="toolbar">
+    <button class="btn" id="aqelSend" type="button">اسأل عقل فِكرتك</button>
+    <button class="btn secondary" id="aqelClear" type="button">محادثة جديدة</button>
+  </div>
+  <p id="aqelStatus" class="muted" role="status">المساعد يحتاج إعداد عنوان الخادم الآمن قبل التشغيل.</p>
+  <small>المحادثة تُرسل إلى خادم فِكرتك لمعالجتها عبر OpenAI. لا تُحفظ المحادثات على الخادم في هذه النسخة.</small>
+</section>
+<script>
+(function(){
+  const API_URL = "https://YOUR-WORKER-NAME.YOUR-SUBDOMAIN.workers.dev/chat";
+  const chat = document.getElementById("aqelChat");
+  const input = document.getElementById("aqelMessage");
+  const send = document.getElementById("aqelSend");
+  const status = document.getElementById("aqelStatus");
+  let history = [];
+  function bubble(text, who) {
+    const node=document.createElement("div");
+    node.style.cssText="padding:12px;border-radius:12px;white-space:pre-wrap;overflow-wrap:anywhere;background:"+(who==="user"?"#f1f3f2":"#e7f3ee")+";border:1px solid #dce6e1";
+    node.textContent=text;
+    chat.appendChild(node);
+    chat.scrollTop=chat.scrollHeight;
+  }
+  async function ask(){
+    const message=input.value.trim();
+    if(!message || send.disabled) return;
+    if(API_URL.includes("YOUR-WORKER-NAME")) {
+      status.textContent="الخادم لم يُربط بعد. بعد نشر Worker ضع رابطه مكان YOUR-WORKER-NAME.YOUR-SUBDOMAIN.";
+      return;
+    }
+    bubble(message,"user"); input.value=""; send.disabled=true; status.textContent="عقل فِكرتك بيفكر...";
+    try {
+      const response=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message,history})});
+      const data=await response.json();
+      if(!response.ok) throw new Error(data.error||"تعذر الاتصال بالمساعد.");
+      bubble(data.reply,"assistant");
+      history.push({role:"user",content:message},{role:"assistant",content:data.reply});
+      history=history.slice(-12);
+      status.textContent="جاهز نكمل مع بعض.";
+    } catch(err) { status.textContent=err.message||"حصل خطأ. حاول تاني."; }
+    finally {send.disabled=false;}
+  }
+  send.addEventListener("click",ask);
+  input.addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();ask();}});
+  document.getElementById("aqelClear").addEventListener("click",()=>{history=[];chat.innerHTML="";bubble("بدأنا محادثة جديدة. احكيلي عن مشروعك!","assistant");status.textContent="محادثة جديدة.";});
+})();
+</script>
+
 </body>
 </html>
