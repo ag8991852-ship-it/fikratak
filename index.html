@@ -38,5 +38,366 @@ function escapeHTML(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":
 function makeReport(){collect();project.name=$("projectName").value.trim()||"فكرة بدون اسم";$("reportName").textContent=project.name;$("reportDate").textContent="تاريخ إعداد التقرير: "+new Date().toLocaleDateString("ar-EG");const answered=steps.filter(s=>(project.answers[s.id]||"").trim());const missing=steps.filter(s=>!(project.answers[s.id]||"").trim());let html="<h3>ملخص إجاباتك</h3>";html+=answered.map(s=>"<h3>"+s.title+"</h3><p>"+escapeHTML(project.answers[s.id]).replace(/\n/g,"<br>")+"</p>").join("");html+="<h3>نقاط تحتاج استكمال</h3>";html+=missing.length?"<ul>"+missing.map(s=>"<li>"+s.title+": "+s.q+"</li>").join("")+"</ul>":"<p>أجبت عن كل المراحل العشر. الخطوة التالية هي اختبار افتراضاتك مع عملاء حقيقيين.</p>";html+="<h3>خطة عمل مقترحة لأول 30 يومًا</h3><ol><li>الأيام 1–7: تحدث مع 5 إلى 10 أشخاص من العملاء المحتملين وتأكد من المشكلة.</li><li>الأيام 8–14: جهّز نموذجًا أوليًا بسيطًا للحل واعرضه على العملاء.</li><li>الأيام 15–21: اختبر السعر وطريقة الوصول للعملاء وسجّل النتائج.</li><li>الأيام 22–30: راجع الملاحظات والتكاليف، ثم قرر ما الذي ستعدّله قبل التوسع.</li></ol><h3>تنبيه</h3><p>الأرقام والتكاليف والأسعار تحتاج تحققًا من السوق الفعلي. لا تعتبر هذه الخطة بديلًا عن دراسة جدوى متخصصة.</p>";$("reportBody").innerHTML=html;$("report").classList.remove("hidden");save(true);$("report").scrollIntoView({behavior:"smooth"})}
 $("newBtn").onclick=()=>{if(!confirm("تبدأ مشروع جديد؟ احفظ الحالي أولًا لو محتاجه."))return;project=fresh($("projectName").value.trim()||"فكرة جديدة");current=0;renderStep();$("report").classList.add("hidden")};$("saveBtn").onclick=()=>save();$("prevBtn").onclick=()=>{collect();if(current>0)current--;renderStep()};$("nextBtn").onclick=()=>{collect();if(current<steps.length-1){current++;renderStep()}else makeReport()};$("reportBtn").onclick=makeReport;$("printBtn").onclick=()=>{if($("report").classList.contains("hidden"))makeReport();window.print()};$("copyBtn").onclick=async()=>{if($("report").classList.contains("hidden"))makeReport();try{await navigator.clipboard.writeText($("report").innerText);alert("تم نسخ التقرير.")}catch(e){alert("النسخ غير متاح في المتصفح. استخدم الطباعة ثم حفظ PDF.")}};project=fresh("فكرتي الأولى");renderStep();renderProjects();
 </script>
+<!-- أدوات المرحلة الثانية - الجزء الأول -->
+<section class="panel" id="phaseTwo">
+  <h2>🧰 أدوات تساعدك تنفّذ فكرتك</h2>
+  <p class="muted">أدوات عملية تساعدك تحوّل التخطيط لقرارات وخطوات.</p>
+
+  <div class="step">
+    <h3>1. حاسبة الأرباح والتكاليف</h3>
+    <label>سعر بيع الوحدة بالجنيه</label>
+    <input id="pPrice" type="number" min="0" placeholder="مثلاً 100">
+    <label>تكلفة الوحدة بالجنيه</label>
+    <input id="pCost" type="number" min="0" placeholder="مثلاً 60">
+    <label>المصاريف الثابتة الشهرية</label>
+    <input id="pFixed" type="number" min="0" placeholder="مثلاً 2000">
+    <label>عدد الوحدات المتوقع بيعها شهرياً</label>
+    <input id="pQty" type="number" min="0" placeholder="مثلاً 100">
+    <button class="btn" onclick="ftProfit()">احسب</button>
+    <p id="pResult"></p>
+  </div>
+
+  <div class="step">
+    <h3>2. مولّد أسماء المشروعات</h3>
+    <label>اكتب مجال مشروعك أو فكرته</label>
+    <input id="nameIdea" placeholder="مثلاً: أكل بيتي أو ملابس">
+    <button class="btn" onclick="ftNames()">اقترح أسماء</button>
+    <div id="nameResult"></div>
+    <small>تحقق من توفر الاسم تجارياً وعلى منصات التواصل قبل استخدامه.</small>
+  </div>
+
+  <div class="step">
+    <h3>3. خريطة أول عميل</h3>
+    <label>مين العميل اللي بتستهدفه؟</label>
+    <textarea id="customerType" placeholder="مثلاً: موظفين في منطقة معينة..."></textarea>
+    <label>إيه المشكلة اللي عنده؟</label>
+    <textarea id="customerProblem" placeholder="اكتب المشكلة باختصار..."></textarea>
+    <label>هتوصل له فين؟</label>
+    <input id="customerPlace" placeholder="مثلاً: مجموعات فيسبوك أو محلات المنطقة">
+    <button class="btn" onclick="ftCustomer()">جهّز خطة الوصول</button>
+    <p id="customerResult"></p>
+  </div>
+
+  <div class="step">
+    <h3>4. بوصلة القرار</h3>
+    <p>قيّم كل بند من 1 إلى 5، حسب وضع فكرتك الحالي.</p>
+    <label>هل المشكلة حقيقية وواضحة؟</label>
+    <input id="d1" type="number" min="1" max="5" value="3">
+    <label>هل تعرف عميلك المستهدف؟</label>
+    <input id="d2" type="number" min="1" max="5" value="3">
+    <label>هل تستطيع تنفيذ تجربة بسيطة؟</label>
+    <input id="d3" type="number" min="1" max="5" value="3">
+    <label>هل لديك تصور للتكاليف والسعر؟</label>
+    <input id="d4" type="number" min="1" max="5" value="3">
+    <button class="btn" onclick="ftDecision()">قيّم جاهزية الفكرة</button>
+    <p id="decisionResult"></p>
+  </div>
+
+  <div class="step">
+    <h3>5. محاكي المستثمر</h3>
+    <p>جاوب عن الأسئلة دي كأنك بتعرض مشروعك على مستثمر.</p>
+    <label>إيه المشكلة اللي بتحلها؟</label>
+    <textarea id="i1"></textarea>
+    <label>مين العميل اللي هيدفع؟</label>
+    <textarea id="i2"></textarea>
+    <label>إيه اللي يميزك عن البدائل؟</label>
+    <textarea id="i3"></textarea>
+    <label>هتستخدم التمويل في إيه؟</label>
+    <textarea id="i4"></textarea>
+    <button class="btn" onclick="ftInvestor()">راجع عرضك</button>
+    <p id="investorResult"></p>
+  </div>
+</section>
+
+<script>
+function ftProfit(){
+  const price=Number(document.getElementById('pPrice').value);
+  const cost=Number(document.getElementById('pCost').value);
+  const fixed=Number(document.getElementById('pFixed').value);
+  const qty=Number(document.getElementById('pQty').value);
+  const out=document.getElementById('pResult');
+  if(price<=0||cost<0||fixed<0||qty<0||!Number.isFinite(price+cost+fixed+qty)){
+    out.textContent='راجع الأرقام واكتب قيماً صحيحة.';
+    return;
+  }
+  const unit=price-cost;
+  const profit=unit*qty-fixed;
+  const breakEven=unit>0?Math.ceil(fixed/unit):null;
+  out.textContent='ربح الوحدة: '+unit.toFixed(2)+' جنيه. صافي النتيجة الشهرية التقديرية: '+profit.toFixed(2)+' جنيه. '+(breakEven===null?'سعر البيع لا يغطي تكلفة الوحدة.':'نقطة التعادل: بيع '+breakEven+' وحدة تقريباً.');
+}
+
+function ftNames(){
+  const idea=document.getElementById('nameIdea').value.trim();
+  const out=document.getElementById('nameResult');
+  if(!idea){out.textContent='اكتب مجال المشروع أولاً.';return;}
+  const names=['بداية '+idea,'لمسة '+idea,'بيت '+idea,'حكاية '+idea,'خطوة '+idea,'أصل '+idea,'رؤية '+idea,'بصمة '+idea];
+  out.innerHTML='<ul>'+names.map(n=>'<li>'+ftEscape(n)+'</li>').join('')+'</ul>';
+}
+
+function ftCustomer(){
+  const type=document.getElementById('customerType').value.trim();
+  const problem=document.getElementById('customerProblem').value.trim();
+  const place=document.getElementById('customerPlace').value.trim();
+  const out=document.getElementById('customerResult');
+  if(!type||!problem||!place){out.textContent='كمّل البيانات الثلاثة الأول.';return;}
+  out.textContent='خطة البداية: 1) ابحث عن 10 أشخاص من الفئة: '+type+'. 2) اسألهم عن المشكلة: '+problem+'. 3) ابدأ البحث عنهم في: '+place+'. 4) اعرض تجربة بسيطة وسجّل ردودهم.';
+}
+
+function ftDecision(){
+  const ids=['d1','d2','d3','d4'];
+  const vals=ids.map(id=>Number(document.getElementById(id).value));
+  const out=document.getElementById('decisionResult');
+  if(vals.some(v=>!Number.isInteger(v)||v<1||v>5)){
+    out.textContent='كل تقييم لازم يكون من 1 إلى 5.';
+    return;
+  }
+  const score=vals.reduce((a,b)=>a+b,0);
+  out.textContent='مجموعك '+score+' من 20. '+(score>=16?'عندك أساس جيد لاختبار الفكرة عملياً.':score>=10?'فيه نقاط محتاجة شغل قبل التوسع.':'ابدأ بتوضيح المشكلة والعميل واختبر الفكرة على نطاق صغير.')+' التقييم إرشادي وليس قراراً استثمارياً.';
+}
+
+function ftInvestor(){
+  const ids=['i1','i2','i3','i4'];
+  const labels=['المشكلة','العميل','الميزة','استخدام التمويل'];
+  const vals=ids.map(id=>document.getElementById(id).value.trim());
+  const missing=labels.filter((label,index)=>!vals[index]);
+  const out=document.getElementById('investorResult');
+  if(missing.length){
+    out.textContent='لسه محتاج تجاوب عن: '+missing.join('، ')+'.';
+    return;
+  }
+  out.textContent='مراجعة أولية: جاوبت عن الأسئلة الأربعة. راجع هل عندك دليل على وجود المشكلة؟ وهل العميل مستعد يدفع؟ وهل استخدام التمويل محدد بأرقام؟';
+}
+
+function ftEscape(value){
+  return String(value).replace(/[&<>"']/g,function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+  });
+}
+</script>
+<!-- نهاية الجزء الأول -->
+  <section class="panel" id="ftPhaseTwoMore">
+  <h2>أدوات إضافية لتطوير مشروعك</h2>
+
+  <div class="tool-card">
+    <h3>6. مختبر الأفكار</h3>
+    <input id="ftLabIdea" placeholder="اكتب فكرتك باختصار">
+    <input id="ftLabProblem" placeholder="ما المشكلة التي تحلها؟">
+    <input id="ftLabAudience" placeholder="مين العميل المستهدف؟">
+    <button onclick="ftLab()">حلّل الفكرة</button>
+    <p id="ftLabResult"></p>
+  </div>
+
+  <div class="tool-card">
+    <h3>7. تحدي 7 أيام</h3>
+    <p>اختار مهمة تنفذها كل يوم، وعلّم عليها بعد الإنجاز.</p>
+    <div id="ftWeekTasks"></div>
+    <p id="ftWeekCount"></p>
+  </div>
+
+  <div class="tool-card">
+    <h3>8. أداة ماذا لو؟</h3>
+    <input id="ftWhatIf" placeholder="ماذا لو حصل إيه في مشروعك؟">
+    <button onclick="ftWhatIfRun()">حلّل السيناريو</button>
+    <ul id="ftWhatIfResult"></ul>
+  </div>
+
+  <div class="tool-card">
+    <h3>9. وضع الطوارئ</h3>
+    <select id="ftEmergencyType">
+      <option value="انخفاض المبيعات">انخفاض المبيعات</option>
+      <option value="نقص السيولة">نقص السيولة</option>
+      <option value="فقدان عميل مهم">فقدان عميل مهم</option>
+      <option value="تعطل التشغيل">تعطل التشغيل</option>
+      <option value="مشكلة مع مورد">مشكلة مع مورد</option>
+    </select>
+    <textarea id="ftEmergencyDetails" placeholder="اشرح المشكلة والموارد المتاحة عندك"></textarea>
+    <button onclick="ftEmergencyRun()">جهّز خطة طوارئ</button>
+    <div id="ftEmergencyResult"></div>
+  </div>
+
+  <div class="tool-card">
+    <h3>10. تصدير واستيراد المشروعات</h3>
+    <button onclick="ftExportProjects()">تصدير نسخة احتياطية</button>
+    <p>أو استرجع نسخة احتياطية محفوظة عندك:</p>
+    <input type="file" id="ftImportFile" accept=".json,application/json">
+    <button onclick="ftImportProjects()">استيراد المشروعات</button>
+    <p id="ftBackupMessage"></p>
+  </div>
+</section>
+
+<style>
+#ftPhaseTwoMore .tool-card {
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 14px;
+  margin: 14px 0;
+}
+#ftPhaseTwoMore input,
+#ftPhaseTwoMore textarea,
+#ftPhaseTwoMore select {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 10px;
+  margin: 6px 0;
+}
+#ftPhaseTwoMore button {
+  padding: 10px 14px;
+  margin: 6px 0;
+  cursor: pointer;
+}
+#ftPhaseTwoMore .ft-task {
+  display: block;
+  margin: 10px 0;
+}
+</style>
+
+<script>
+function ftLab() {
+  const idea = document.getElementById('ftLabIdea').value.trim();
+  const problem = document.getElementById('ftLabProblem').value.trim();
+  const audience = document.getElementById('ftLabAudience').value.trim();
+  const result = document.getElementById('ftLabResult');
+
+  if (!idea || !problem || !audience) {
+    result.textContent = 'كمّل بيانات الفكرة والمشكلة والعميل المستهدف الأول.';
+    return;
+  }
+
+  result.textContent =
+    'ملخص فكرتك: ' + idea +
+    '. المشكلة: ' + problem +
+    '. العميل: ' + audience +
+    '. اختبر الفكرة مع 5 عملاء محتملين، واسألهم عن المشكلة واستعدادهم للدفع قبل ما تستثمر.';
+}
+
+const ftWeekItems = [
+  'اكتب وصفًا واضحًا لفكرتك',
+  'حدد المشكلة التي تحلها',
+  'تحدث مع عميل محتمل',
+  'ادرس 3 منافسين',
+  'احسب التكلفة والسعر',
+  'اعرض نموذجًا أوليًا',
+  'راجع النتائج وحدد الخطوة التالية'
+];
+
+function ftRenderWeek() {
+  const area = document.getElementById('ftWeekTasks');
+  const saved = JSON.parse(localStorage.getItem('ft_week_tasks') || '[]');
+
+  area.innerHTML = '';
+  ftWeekItems.forEach((task, index) => {
+    const label = document.createElement('label');
+    label.className = 'ft-task';
+
+    const check = document.createElement('input');
+    check.type = 'checkbox';
+    check.checked = saved.includes(index);
+    check.addEventListener('change', () => {
+      let current = JSON.parse(localStorage.getItem('ft_week_tasks') || '[]');
+      current = current.filter(x => x !== index);
+      if (check.checked) current.push(index);
+      localStorage.setItem('ft_week_tasks', JSON.stringify(current));
+      ftRenderWeek();
+    });
+
+    label.appendChild(check);
+    label.appendChild(document.createTextNode(' ' + (index + 1) + '. ' + task));
+    area.appendChild(label);
+  });
+
+  document.getElementById('ftWeekCount').textContent =
+    'أنجزت ' + saved.length + ' من 7 مهام.';
+}
+
+function ftWhatIfRun() {
+  const scenario = document.getElementById('ftWhatIf').value.trim();
+  const result = document.getElementById('ftWhatIfResult');
+  result.innerHTML = '';
+
+  if (!scenario) {
+    result.textContent = 'اكتب السيناريو الأول.';
+    return;
+  }
+
+  [
+    'ما السبب المحتمل لحدوث الموقف؟',
+    'ما تأثيره على العملاء والتكاليف والإيرادات؟',
+    'ما الحلول المتاحة أمامك؟',
+    'ما أقل خطوة آمنة يمكنك تنفيذها الآن؟',
+    'كيف ستعرف أن الحل نجح؟'
+  ].forEach(question => {
+    const li = document.createElement('li');
+    li.textContent = question;
+    result.appendChild(li);
+  });
+}
+
+function ftEmergencyRun() {
+  const type = document.getElementById('ftEmergencyType').value;
+  const details = document.getElementById('ftEmergencyDetails').value.trim();
+  const result = document.getElementById('ftEmergencyResult');
+
+  result.textContent =
+    'الأزمة: ' + type + '. ' +
+    'ابدأ بتحديد حجم الضرر والالتزامات العاجلة، ثم أوقف المصروفات غير الضرورية مؤقتًا، ' +
+    'وتواصل مع الأطراف المتأثرة، وحدد إجراءً عمليًا خلال 24 ساعة. ' +
+    'تفاصيلك: ' + (details || 'لم تُضف تفاصيل بعد.');
+}
+
+function ftExportProjects() {
+  const raw = localStorage.getItem('fikratak_projects');
+
+  if (!raw) {
+    document.getElementById('ftBackupMessage').textContent =
+      'مش لاقي بيانات مشروعات محفوظة بالمفتاح fikratak_projects على الجهاز ده.';
+    return;
+  }
+
+  const blob = new Blob([raw], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'fikratak-backup.json';
+  link.click();
+  URL.revokeObjectURL(url);
+
+  document.getElementById('ftBackupMessage').textContent =
+    'تم تجهيز ملف النسخة الاحتياطية.';
+}
+
+function ftImportProjects() {
+  const file = document.getElementById('ftImportFile').files[0];
+  const message = document.getElementById('ftBackupMessage');
+
+  if (!file) {
+    message.textContent = 'اختار ملف JSON الأول.';
+    return;
+  }
+
+  const reader = new FileReader();
+
+  reader.onload = () => {
+    try {
+      const parsed = JSON.parse(reader.result);
+      if (!Array.isArray(parsed)) {
+        throw new Error('صيغة غير متوقعة');
+      }
+
+      if (!confirm('الاستيراد هيستبدل بيانات المشروعات المحفوظة على هذا الجهاز. متأكد؟')) {
+        return;
+      }
+
+      localStorage.setItem('fikratak_projects', JSON.stringify(parsed));
+      message.textContent = 'تم استيراد البيانات. حدّث الصفحة لمراجعتها.';
+    } catch (error) {
+      message.textContent = 'الملف غير صالح أو مش بنفس صيغة النسخة الاحتياطية.';
+    }
+  };
+
+  reader.readAsText(file);
+}
+
+ftRenderWeek();
+    </script>
 </body>
 </html>
